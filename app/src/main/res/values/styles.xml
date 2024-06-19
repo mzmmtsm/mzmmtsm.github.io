@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+    </style>
+
+<!--MyTheme表示样式的名称-->
+    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
+        <!--android:windowFrame表示窗口的背景颜色-->
+        <item name="android:windowFrame">@android:color/transparent</item>
+        <!--android:windowBackground表示窗口的背景图片-->
+        <item name="android:windowBackground">@color/setbackground4</item>
+        <!--android:windowIsTranslucent表示窗口是否显示-->
+        <item name="android:windowIsTranslucent">true</item>
+        <!--android:windowNoTitle表示窗口是否有标题-->
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+
+</resources>

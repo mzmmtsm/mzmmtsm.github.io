@@ -1,18 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--androidx.constraintlayout.widget.ConstraintLayout-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <SurfaceView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/surface"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<!--
+    android:layout_alignParentBottom="true"，将控件放在底部
+    android:padding="@dimen/dp_10"，调用的是尺寸资源dp_10代表的值
+  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottom_bar"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical"
+        android:padding="@dimen/dp_10">
+
+        <ImageView
+            android:layout_width="@dimen/dp_30"
+            android:layout_height="@dimen/dp_45"
+            android:id="@+id/minus"
+            android:layout_marginLeft="@dimen/dp_30"
+            android:src="@mipmap/downsmall"
+            android:scaleType="centerInside"/>
+        
+        <SeekBar
+            android:layout_width="@dimen/dp_e"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekbar"
+            android:layout_weight="1"
+            android:progress="0"
+            android:thumbOffset="@dimen/dp_e"/>
+
+        <ImageView
+            android:layout_width="@dimen/dp_45"
+            android:layout_height="@dimen/dp_45"
+            android:id="@+id/add"
+            android:layout_marginRight="@dimen/dp_30"
+            android:src="@mipmap/uplarge"
+            android:scaleType="centerInside"/>
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+</RelativeLayout>
