@@ -5,12 +5,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/surface"/>
+
+<!--
+android:scaleType="fitXY"，不按比例扩大或缩小-->
+    <com.example.magicmirror.view.PictrueView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/picture"
+        android:scaleType="fitXY"/>
+
+    <com.example.magicmirror.view.FunctionView
+        android:id="@+id/function"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 
 <!--
     android:layout_alignParentBottom="true"，将控件放在底部
@@ -47,17 +61,14 @@
             android:layout_marginRight="@dimen/dp_30"
             android:src="@mipmap/uplarge"
             android:scaleType="centerInside"/>
-
-
-
     </LinearLayout>
 
-
-
-
-
-
-
+<!--     android:visibility="gone",表示控件不可见，也不占用系统布局空间-->
+    <com.example.magicmirror.view.DrawView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/draw_glasses"
+        android:visibility="gone"/>
 
 
 </RelativeLayout>
