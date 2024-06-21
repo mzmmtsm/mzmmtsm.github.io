@@ -1,5 +1,6 @@
 package com.example.magicmirror.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -9,6 +10,7 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -21,9 +23,10 @@ import com.example.magicmirror.view.DrawView;
 import com.example.magicmirror.view.FunctionView;
 import com.example.magicmirror.view.PictrueView;
 
+import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback,SeekBar.OnSeekBarChangeListener,View.OnTouchListener,View.OnClickListener {
     private static final String TAG=MainActivity.class.getSimpleName();  //获得雷鸣
     private  SurfaceHolder holder;  //用于控制SurfaceView显示的内容
     private SurfaceView surfaceView;    //显示相机拍摄的内容
@@ -48,12 +51,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initViews();
+        setViews();
     }
 
     /**
@@ -179,26 +185,139 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        Log.e("surfaceCreated","绘制开始");
+        try {
+            setCamera();;                       //设置摄像头
+            camera.setPreviewDisplay(holder);   //设置预览显示的holder对象
+            camera.startPreview();              //  开始预览
+        } catch (IOException e) {
+            camera.release();   //  相机释放
+            camera=null;        //  清空对象
+            e.printStackTrace();
+
+        }
+    }
+
+    @Override
+    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
+        Log.e("surfaceCreated","绘制改变");
+        try {
+            camera.stopPreview();   //相机停止预览
+            camera.setPreviewDisplay(holder);       // 设置相机预览显示区域
+            camera.startPreview();      //相机启动预览
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
+        Log.e("surfaceDestroyed","绘制结束");
+        toRelease();
+    }
+
+    /**
+     * 释放相机资源
+     */
+    private void toRelease(){
+        camera.setPreviewCallback(null);    //
+        camera.stopPreview();
+        camera.release();
+        camera=null;
+    }
+
+    private void setViews(){
+        holder=surfaceView.getHolder();
+        holder.addCallback(this);
+        add.setOnTouchListener(this);
+        minus.setOnTouchListener(this);
+        seekBar.setOnSeekBarChangeListener(this);
+    }
+
+    /**
+     * 通过改变控件seekBar值，设置相机焦距
+     * @param want
+     */
+    private void setZoomValues(int want){
+        Camera.Parameters parameters = camera.getParameters();
+        seekBar.setProgress(want);
+        camera.setParameters(parameters);
+    }
+
+    /**
+     * 获取相机参数和当前焦距值
+     */
+    private int getZoomValue(){
+        Camera.Parameters parameters=camera.getParameters();
+        int values=parameters.getZoom();
+        return values;
+    }
+
+    /**
+     * 增加焦距方法
+     */
+    private void addZoomValues(){
+        if (nowFocus > maxFocus){
+            Log.e(TAG,"大于最大焦距值");
+        }else if (nowFocus == maxFocus){
+
+        }else {
+            setZoomValues(getZoomValue() + everyFocus);
+        }
+    }
+
+    /**
+     * 减少焦距方法
+     */
+    private void minusZoomValues(){
+        if (nowFocus < maxFocus){
+            Log.e(TAG,"小于最大焦距值");
+        }else if (nowFocus == maxFocus){
+
+        }else {
+            setZoomValues(getZoomValue() - everyFocus);
+        }
+    }
+
+    /**
+     * 拖动改变焦距
+     */
+    public void onProgressChanged(SeekBar seekBar,int progress,boolean fromUser){
+        //0~99
+        Camera.Parameters parameters=camera.getParameters();
+        nowFocus=progress;
+        parameters.setZoom(progress);
+        camera.setParameters(parameters);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
 
 
+    @Override
+    public void onClick(View v) {
 
+    }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if (v.getId() == R.id.add){
+            addZoomValues();
+        }else if (v.getId() == R.id.minus){
+            minusZoomValues();
+        } else if (v.getId() == R.id.picture) {
+            //待添加
+        }
+        return true;
+    }
 }
