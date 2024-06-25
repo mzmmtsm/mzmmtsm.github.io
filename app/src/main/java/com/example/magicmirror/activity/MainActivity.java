@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
@@ -26,7 +27,7 @@ import com.example.magicmirror.view.PictrueView;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback,SeekBar.OnSeekBarChangeListener,View.OnTouchListener,View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback,SeekBar.OnSeekBarChangeListener,View.OnTouchListener,View.OnClickListener,FunctionView.onFunctionViewItemClickListener {
     private static final String TAG=MainActivity.class.getSimpleName();  //获得雷鸣
     private  SurfaceHolder holder;  //用于控制SurfaceView显示的内容
     private SurfaceView surfaceView;    //显示相机拍摄的内容
@@ -231,9 +232,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private void setViews(){
         holder=surfaceView.getHolder();
         holder.addCallback(this);
-        add.setOnTouchListener(this);
-        minus.setOnTouchListener(this);
-        seekBar.setOnSeekBarChangeListener(this);
+        add.setOnTouchListener(this);   //放大焦距
+        minus.setOnTouchListener(this);     //缩小焦距
+        seekBar.setOnSeekBarChangeListener(this);   //进度条监听
+        functionView.setOnFunctionViewItemClickListener(this);  //调用按钮单击监听事件
     }
 
     /**
@@ -319,5 +321,28 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             //待添加
         }
         return true;
+    }
+
+
+    @Override
+    public void hint() {
+        Intent intent = new Intent(this, HintActivity.class);
+        startActivity(intent);      //界面跳转到系统帮助页面
+
+    }
+
+    @Override
+    public void choose() {
+
+    }
+
+    @Override
+    public void down() {
+
+    }
+
+    @Override
+    public void up() {
+
     }
 }
