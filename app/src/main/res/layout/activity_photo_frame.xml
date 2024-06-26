@@ -17,6 +17,7 @@
 
 
     <GridView
+        android:id="@+id/photo_frame_list"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_e"
         android:layout_weight="1"

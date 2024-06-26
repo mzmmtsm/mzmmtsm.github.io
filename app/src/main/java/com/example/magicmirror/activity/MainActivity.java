@@ -1,6 +1,7 @@
 package com.example.magicmirror.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.example.magicmirror.R;
 import com.example.magicmirror.view.DrawView;
@@ -50,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private int nowFocus;       //当前的焦距值
     private Camera camera;      //声明相机变量
 
+    private int frame_index;    //镜框类型
+    private int[] frame_index_ID;   //图片资源ID的数组
+    private static final  int PHOTO=1;  //镜框请求值
+
 
 
 
@@ -61,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         setContentView(R.layout.activity_main);
         initViews();
         setViews();
+        frame_index=0;
+        frame_index_ID=new int[] {R.mipmap.mag_0001,R.mipmap.mag_0003,R.mipmap.mag_0005,
+                R.mipmap.mag_0006,R.mipmap.mag_0007,R.mipmap.mag_0008,R.mipmap.mag_0009,
+                R.mipmap.mag_0011,R.mipmap.mag_0012,R.mipmap.mag_0014};
     }
 
     /**
@@ -333,7 +343,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     @Override
     public void choose() {
-
+        Intent intent = new Intent(this, PhotoFrameActivity.class);
+        startActivityForResult(intent,PHOTO);   //跳转页面并获得选择镜框ID的返回值
+        Toast.makeText(this,"选择！",Toast.LENGTH_SHORT).show();   //提示
     }
 
     @Override
@@ -345,4 +357,29 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public void up() {
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.e(TAG,"返回值："+requestCode+"请求值"+resultCode);
+        if (resultCode == RESULT_OK && requestCode == PHOTO){
+            int position = data.getIntExtra("POSITION",0);  //从返回数据获得POSITION值
+            frame_index = position; //  图片位置赋值
+            Log.e(TAG,"返回的镜框类别："+ position);
+            pictrueView.setPhotoFrame(position);    //传递POSITION值，设置镜框
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }

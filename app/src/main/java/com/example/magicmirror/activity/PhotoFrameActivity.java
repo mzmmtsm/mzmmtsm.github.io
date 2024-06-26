@@ -1,14 +1,20 @@
 package com.example.magicmirror.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +27,9 @@ public class PhotoFrameActivity extends AppCompatActivity
     private int[] photo_styles; //图片的数组
     private String[] photo_name;    //图片的名称数组
     private Bitmap[] bitmaps; //镜框的集合
+
+
+
 
     private void initDatas(){
         //图片样式
@@ -86,32 +95,76 @@ public class PhotoFrameActivity extends AppCompatActivity
          */
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-//            未确定
-            RecyclerView.ViewHolder holder;
+//
+            ViewHolder holder;
             if (convertView == null){
-                holder =new RecyclerView.ViewHolder();
+                holder =new ViewHolder();
+                //将布局填充成控件
+                convertView = getLayoutInflater().inflate(R.layout.item_gridview,null);
+                //获取展示图片的控件对象
+                holder.image =(ImageView) convertView.findViewById(R.id.item_pic);
+                //获取展示文本的控件对象
+                holder.text = (TextView) convertView.findViewById(R.id.item_text);
+                convertView.setTag(holder);
+            }else {
+                holder = (ViewHolder) convertView.getTag(); //根据tag获取holder对象
             }
-            return null;
+            setData(holder,position);   //设置控件显示
+            return convertView;
         }
+
+        /**
+         * 设置数据
+         */
+        private void setData(ViewHolder holder,int position){
+            holder.image.setImageBitmap(bitmaps[position]); //设置图片
+            holder.text.setText((photo_name[position]));
+        }
+
+        class ViewHolder{
+            ImageView image;    //声明图片控件
+            TextView text;
+
+        }
+
+    }
+    /**
+     * item单击事件
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent();
+        intent.putExtra("POSITION",position);   //设置图片位置数据进行传输
+        setResult(RESULT_OK,intent);    //将选取的结果返回给主窗体
+        finish();   //关闭窗口
     }
 
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.back_to_main)
+            finish();   //关闭窗口
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);   //满屏显示
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_photo_frame);  //获取布局
+
+        //初始化控件
+        textView = (TextView) findViewById(R.id.back_to_main);
+        gridView = (GridView) findViewById(R.id.photo_frame_list);
+
+        initDatas();    //初始化数据
+
+        textView.setOnClickListener(this);  //设置控件
+
+        PhotoFrameAdapter adapter = new PhotoFrameAdapter();  //创建适配器
+        gridView.setAdapter(adapter);   //绑定适配器
+        gridView.setOnItemClickListener(this);  //执行子项单击监听事件
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 }
