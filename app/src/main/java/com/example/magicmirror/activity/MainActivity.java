@@ -11,17 +11,22 @@ import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.magicmirror.R;
+import com.example.magicmirror.utils.AudioRecordManger;
 import com.example.magicmirror.utils.SetBrightness;
 import com.example.magicmirror.view.DrawView;
 import com.example.magicmirror.view.FunctionView;
@@ -30,7 +35,9 @@ import com.example.magicmirror.view.PictrueView;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback,SeekBar.OnSeekBarChangeListener,View.OnTouchListener,View.OnClickListener,FunctionView.onFunctionViewItemClickListener {
+public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback,
+        SeekBar.OnSeekBarChangeListener,View.OnTouchListener,View.OnClickListener,
+        FunctionView.onFunctionViewItemClickListener,DrawView.OnCaYiCaCompleteListener {
     private static final String TAG=MainActivity.class.getSimpleName();  //获得雷鸣
     private  SurfaceHolder holder;  //用于控制SurfaceView显示的内容
     private SurfaceView surfaceView;    //显示相机拍摄的内容
@@ -61,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private boolean isAutoBrightness;   //屏幕是否为自动调节
     private int SegmentLengh;   //把亮度分为8段，每段为256的1/8
 
+    private AudioRecordManger audioRecordManger;    //调用话筒实现类
+    private static final int RECORD =2;     //监听话筒
+
 
 
 
@@ -77,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 R.mipmap.mag_0006,R.mipmap.mag_0007,R.mipmap.mag_0008,R.mipmap.mag_0009,
                 R.mipmap.mag_0011,R.mipmap.mag_0012,R.mipmap.mag_0014};
         getBrightnessFromWindow();  //获取屏幕亮度的相关属性
+
+        audioRecordManger = new AudioRecordManger(handler,RECORD);
+        audioRecordManger.getNoiseLevel();
     }
 
     /**
@@ -252,6 +265,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         minus.setOnTouchListener(this);     //缩小焦距
         seekBar.setOnSeekBarChangeListener(this);   //进度条监听
         functionView.setOnFunctionViewItemClickListener(this);  //调用按钮单击监听事件
+
+        pictrueView.setOnTouchListener(this);   //图片pictrueView监听
+
+        drawView.setOnCaYiCaCompleteListener(this); //画布监听
     }
 
     /**
@@ -429,14 +446,59 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         getAfterMySetBrightnessValues();//获取设置后的屏幕亮度
     }
 
+    /**
+     * 吹起起雾时，影藏主界面上的控件
+     */
+    private void hideView(){
+        bottom.setVisibility(View.INVISIBLE);
+        functionView.setVisibility(View.GONE);
+    }
+
+    /**
+     * 擦除雾气后重新显示控件
+     */
+    private void showView(){
+        pictrueView.setImageBitmap(null);
+        bottom.setVisibility(View.VISIBLE);
+        functionView.setVisibility(View.VISIBLE);
+    }
+    /**
+     * 分贝值超50时，调用起雾界面
+     */
+    private void getSoundValues(double values){
+        //话筒分贝大于50，屏幕起雾
+        if (values >50){
+            hideView();//影藏无关控件
+            drawView.setVisibility(View.VISIBLE);   //显示控件
+            //
+            Animation animation = AnimationUtils.loadAnimation(this,R.anim.in_window);
+            drawView.setAnimation(animation);
+            audioRecordManger.isGetVoiceRun = false;    //设置话筒停止
+            Log.e("玻璃显示","执行");
+        }
+    }
+
+    //创建处理话筒消息的对象，检测话筒获取话筒声音
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case RECORD:
+                    double soundValues = (double) msg.obj;
+                    getSoundValues(soundValues);
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+    });
 
 
-
-
-
-
-
-
-
-
+    @Override
+    public void complete() {
+        showView(); //显示控件
+        audioRecordManger.getNoiseLevel();
+        drawView.setVisibility(View.GONE);
+    }
 }
